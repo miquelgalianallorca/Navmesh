@@ -19,32 +19,33 @@ function drawBackground(image, sizeX, sizeY)
     layer:insertProp(prop)
 end
 
-drawBackground("background.png", 1024, 768)
+-- drawBackground("background.png", 1024, 768)
+drawBackground("kikimora.jpg", 364, 420)
 
-texture_name = "ghost32.png"
-gfxQuad = MOAIGfxQuad2D.new()
-gfxQuad:setTexture(texture_name)
-gfxQuad:setRect(-16, -16, 16, 16)
-gfxQuad:setUVRect(0, 0, 1, 1)
-  
-prop = MOAIProp2D.new()
-prop:setDeck(gfxQuad)
+-- texture_name = "ghost32.png"
+-- gfxQuad = MOAIGfxQuad2D.new()
+-- gfxQuad:setTexture(texture_name)
+-- gfxQuad:setRect(-16, -16, 16, 16)
+-- gfxQuad:setUVRect(0, 0, 1, 1)
+--   
+-- prop = MOAIProp2D.new()
+-- prop:setDeck(gfxQuad)
 
-entity = Character.new()
+-- entity = Character.new()
 -- Add prop to be the renderable for this character
-entity:setProp(prop, layer)
+-- entity:setProp(prop, layer)
 -- Start the character (allow calls to OnUpdate)
-entity:start()
-entity:setLoc(0, 0)
-entity:setRot(0)
-entity:setLinearVel(10, 20)
-entity:setAngularVel(30)
+-- entity:start()
+-- entity:setLoc(0, 0)
+-- entity:setRot(0)
+-- entity:setLinearVel(10, 20)
+-- entity:setAngularVel(30)
 
 -- Enable Debug Draw
 debug = MOAIDrawDebug.get();
 layer:setDrawDebug(debug)
 -- Add this character to draw debug
-MOAIDrawDebug.insertEntity(entity)
+-- MOAIDrawDebug.insertEntity(entity)
 
 
 pathfinder = Pathfinder.new()
