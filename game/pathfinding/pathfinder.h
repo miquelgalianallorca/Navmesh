@@ -6,6 +6,20 @@
 class Pathfinder: public virtual MOAIEntity2D
 {
 public:
+	
+	struct NavPolygon
+	{
+		struct Edge
+		{
+			int m_verts[2]; // Indices de m_verts
+			NavPolygon* m_pNeighbour;
+		};
+		std::vector<USVec2D> m_verts;
+		std::vector<Edge> m_Edges;
+		// TerrainType m_terreno;
+		// Otros: centro, área, plano, etc
+	};
+	
 	Pathfinder();
 	~Pathfinder();
 
@@ -22,6 +36,11 @@ private:
 private:
 	USVec2D m_StartPosition;
 	USVec2D m_EndPosition;
+
+	std::vector<NavPolygon> m_Navmesh;
+
+	void CreateEdges();
+
 
 	// Lua configuration
 public:

@@ -19,6 +19,9 @@
     <ClCompile Include="pathfinding\pathfinder.cpp">
       <Filter>pathfinder</Filter>
     </ClCompile>
+    <ClCompile Include="pugixml\pugixml.cpp">
+      <Filter>pugixml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
@@ -36,6 +39,12 @@
     <ClInclude Include="pathfinding\pathfinder.h">
       <Filter>pathfinder</Filter>
     </ClInclude>
+    <ClInclude Include="pugixml\pugiconfig.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml\pugixml.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="host">
@@ -47,10 +56,18 @@
     <Filter Include="pathfinder">
       <UniqueIdentifier>{47ed7435-33e6-42c5-a299-696662ae0eb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pugixml">
+      <UniqueIdentifier>{1f6f9af2-1640-4bc5-b74a-dc8f3229c441}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="sample\test.lua">
       <Filter>sample</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="sample\navmesh.xml">
+      <Filter>sample</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
