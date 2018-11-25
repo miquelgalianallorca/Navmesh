@@ -84,13 +84,13 @@ void Pathfinder::UpdatePath()
 void Pathfinder::DrawDebug()
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
-	gfxDevice.SetPenWidth(1.f);
-	;
+	gfxDevice.SetPenWidth(2.f);
+
 	for (NavPolygon& polygon : m_Navmesh)
 	{
-		gfxDevice.SetPenColor(0.0f, 0.0f, 1.0f, 0.05f);
+		gfxDevice.SetPenColor(.2f, .3f, 0.f, .1f);
 		MOAIDraw::DrawPolygonFilled(polygon.m_verts);
-		gfxDevice.SetPenColor(0.0f, 0.0f, 1.0f, 1.f);
+		gfxDevice.SetPenColor(0.f, 1.0f, 0.f, 1.f);
 		MOAIDraw::DrawPolygon(polygon.m_verts);
 	}
 }
