@@ -1,8 +1,8 @@
 #include <stdafx.h>
 #include <algorithm>
-#include "path.h"
+#include "pathGrid.h"
 
-Path::~Path()
+PathGrid::~PathGrid()
 {
 	for (Node* node : nodes)
 		delete node;
@@ -10,7 +10,7 @@ Path::~Path()
 	path.clear();
 }
 
-void Path::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
+void PathGrid::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
 {
 	this->rows = rows;
 	this->cols = cols;
@@ -45,7 +45,7 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 	}
 }
 
-void Path::ResetNodes()
+void PathGrid::ResetNodes()
 {
 	for (Node* node : nodes)
 	{
@@ -61,7 +61,7 @@ void Path::ResetNodes()
 
 // Heuristics: Euclidean distance. Manhattan could give longer paths than necessary.
 // Start and end in map coords (not in screen coords)
-bool Path::AStar(const float startX, const float startY, const float endX, const float endY)
+bool PathGrid::AStar(const float startX, const float startY, const float endX, const float endY)
 {	
 	/*
 	openlist
@@ -105,10 +105,10 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 	return false;
 }
 
-bool Path::AStarStep()
+bool PathGrid::AStarStep()
 {
 	// Get shortest
-	openList.sort(Path::OrderByShortest);
+	openList.sort(PathGrid::OrderByShortest);
 	Node* node = openList.front();
 	
 	// Check goal
@@ -157,7 +157,7 @@ bool Path::AStarStep()
 	return false;
 }
 
-void Path::DrawDebug(const size_t& squareSize)
+void PathGrid::DrawDebug(const size_t& squareSize)
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
 	
@@ -208,7 +208,7 @@ void Path::DrawDebug(const size_t& squareSize)
 	}
 }
 
-void Path::CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY, const size_t squareSize,
+void PathGrid::CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY, const size_t squareSize,
 	float& OutPosX, float& OutPosY)
 {
 	// Top-left
@@ -219,7 +219,7 @@ void Path::CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY,
 	OutPosY = offsetY + static_cast<float>(InPosY) * squareSize * 2;
 }
 
-void Path::WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize,
+void PathGrid::WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize,
 	unsigned int& OutPosX, unsigned int& OutPosY)
 {
 	float offsetX = -1.f * squareSize * GetCols();
@@ -229,7 +229,7 @@ void Path::WorldPosToCoord(const float InPosX, const float InPosY, const size_t 
 	OutPosY = static_cast<unsigned int>((InPosY - offsetY) / (squareSize * 2));
 }
 
-std::list<Node*> Path::GetConnections(unsigned int posX, unsigned int posY)
+std::list<PathGrid::Node*> PathGrid::GetConnections(unsigned int posX, unsigned int posY)
 {
 	// cout << "Get connections of: " << posX << " " << posY;
 	std::list<Node*> connections;
@@ -256,7 +256,7 @@ std::list<Node*> Path::GetConnections(unsigned int posX, unsigned int posY)
 	return connections;
 }
 
-void Path::BuildPath(Node* node)
+void PathGrid::BuildPath(Node* node)
 {
 	path.clear();
 
@@ -271,7 +271,7 @@ void Path::BuildPath(Node* node)
 	cout << "Path built." << endl;
 }
 
-Node* Path::GetNodeAtPosition(unsigned int posX, unsigned int posY)
+PathGrid::Node* PathGrid::GetNodeAtPosition(unsigned int posX, unsigned int posY)
 {
 	for (Node* node : nodes)
 	{
@@ -283,15 +283,15 @@ Node* Path::GetNodeAtPosition(unsigned int posX, unsigned int posY)
 	return nullptr;
 }
 
-float Path::Heuristics(const Node* next, const Node* goal)
+float PathGrid::Heuristics(const Node* next, const Node* goal)
 {
-	USVec2D nextPos = USVec2D(next->posX, next->posY);
-	USVec2D goalPos = USVec2D(goal->posX, goal->posY);
+	USVec2D nextPos = USVec2D(static_cast<float>(next->posX), static_cast<float>(next->posY));
+	USVec2D goalPos = USVec2D(static_cast<float>(goal->posX), static_cast<float>(goal->posY));
 
 	return nextPos.Dist(goalPos);
 }
 
-bool Path::IsValidCoord(const USVec2D pos)
+bool PathGrid::IsValidCoord(const USVec2D pos)
 {
 	unsigned int x = static_cast<unsigned int>(pos.mX);
 	unsigned int y = static_cast<unsigned int>(pos.mY);

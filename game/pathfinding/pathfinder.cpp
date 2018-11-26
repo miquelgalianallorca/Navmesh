@@ -1,5 +1,6 @@
 #include <stdafx.h>
 #include "pathfinder.h"
+#include "pathNavmesh.h"
 #include "pugixml/pugixml.hpp"
 
 // P8
@@ -76,7 +77,7 @@ void Pathfinder::CreateEdges()
 	for (NavPolygon& polygon : m_Navmesh)
 	{
 		size_t nVerts = polygon.m_verts.size();
-		for (int i = 0; i < nVerts; ++i)
+		for (size_t i = 0; i < nVerts; ++i)
 		{
 			// Edge to previous vertex
 			NavPolygon::Edge edge;

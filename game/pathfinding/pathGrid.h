@@ -1,34 +1,36 @@
 #pragma once
 
-struct Node
-{
-	Node() {}
-	Node(unsigned int _posX, unsigned int _posY, unsigned int _cost) :
-		posX(_posX),
-		posY(_posY),
-		cost(_cost),
-		parent(nullptr)
-	{}
+#include "pathfinder.h"
 
-	unsigned int posX;
-	unsigned int posY;   // Map grid location
-	int   cost;          // Traverse cost of grid location
-	
-	Node* parent;	
-	float g;             // Cost from origin to pos
-	float f;             // f = g + h, h = Estimated cost from pos to goal
-};
-
-class Path
+class PathGrid
 {
 public:
-	Path() :
+	struct Node
+	{
+		Node() {}
+		Node(unsigned int _posX, unsigned int _posY, unsigned int _cost) :
+			posX(_posX),
+			posY(_posY),
+			cost(_cost),
+			parent(nullptr)
+		{}
+
+		unsigned int posX;
+		unsigned int posY;   // Map grid location
+		int   cost;          // Traverse cost of grid location
+
+		Node* parent;
+		float g;             // Cost from origin to pos
+		float f;             // f = g + h, h = Estimated cost from pos to goal
+	};
+
+	PathGrid() :
 		rows(0),
 		cols(0),
 		isStepByStepModeOn(false)
 	{}
 
-	~Path();
+	~PathGrid();
 	
 	void Load(const std::string& filename, const unsigned int rows, const unsigned int cols);
 	bool AStar(const float startX, const float startY, const float endX, const float endY);

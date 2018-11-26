@@ -22,7 +22,10 @@
     <ClCompile Include="pugixml\pugixml.cpp">
       <Filter>pugixml</Filter>
     </ClCompile>
-    <ClCompile Include="pathfinding\path.cpp">
+    <ClCompile Include="pathfinding\pathGrid.cpp">
+      <Filter>pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinding\pathNavmesh.cpp">
       <Filter>pathfinder</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,7 +51,10 @@
     <ClInclude Include="pugixml\pugixml.hpp">
       <Filter>pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="pathfinding\path.h">
+    <ClInclude Include="pathfinding\pathGrid.h">
+      <Filter>pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinding\pathNavmesh.h">
       <Filter>pathfinder</Filter>
     </ClInclude>
   </ItemGroup>

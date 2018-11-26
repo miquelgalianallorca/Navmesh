@@ -2,12 +2,10 @@
 #define __PATHFINDER_H__
 
 #include <moaicore/MOAIEntity2D.h>
-#include "path.h"
 
 class Pathfinder: public virtual MOAIEntity2D
 {
 public:
-	
 	struct NavPolygon
 	{
 		struct Edge
@@ -42,7 +40,7 @@ private:
 
 	USVec2D m_StartPosition;
 	USVec2D m_EndPosition;
-	Path    path;
+	class PathNavmesh* path;
 	std::vector<NavPolygon> m_Navmesh;
 
 
