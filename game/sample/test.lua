@@ -44,14 +44,14 @@ entity:setAngularVel(30)
 -- Enable Debug Draw
 debug = MOAIDrawDebug.get();
 layer:setDrawDebug(debug)
--- Add this character to draw debug
-MOAIDrawDebug.insertEntity(entity)
-
 
 pathfinder = Pathfinder.new()
 pathfinder:setStartPosition(5, 10)
 pathfinder:setEndPosition(20, 40)
+
+-- Add this character to draw debug
 MOAIDrawDebug.insertEntity(pathfinder)
+MOAIDrawDebug.insertEntity(entity)
 
 mouseX = 0
 mouseY = 0

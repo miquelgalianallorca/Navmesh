@@ -71,6 +71,11 @@ void Pathfinder::CreateEdges()
 			else		edge.m_verts[0] = i - 1;
 			edge.m_verts[1] = i;
 
+			// Center of edge
+			float centerX = (polygon.m_verts[edge.m_verts[0]].mX + polygon.m_verts[edge.m_verts[1]].mX) / 2;
+			float centerY = (polygon.m_verts[edge.m_verts[0]].mY + polygon.m_verts[edge.m_verts[1]].mY) / 2;
+			edge.m_center = USVec2D(centerX, centerY);
+
 			polygon.m_Edges.push_back(edge);
 		}
 	}
@@ -84,14 +89,27 @@ void Pathfinder::UpdatePath()
 void Pathfinder::DrawDebug()
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
+	
+	// Draw navmesh
 	gfxDevice.SetPenWidth(2.f);
-
 	for (NavPolygon& polygon : m_Navmesh)
 	{
 		gfxDevice.SetPenColor(.2f, .3f, 0.f, .1f);
 		MOAIDraw::DrawPolygonFilled(polygon.m_verts);
 		gfxDevice.SetPenColor(0.f, 1.0f, 0.f, 1.f);
 		MOAIDraw::DrawPolygon(polygon.m_verts);
+
+		// Draw edge centers
+		for (auto edge : polygon.m_Edges)
+		{
+			gfxDevice.SetPenColor(0.f, 0.f, 1.f, .5f);
+			USRect rect;
+			rect.mXMin = edge.m_center.mX - 3.f;
+			rect.mXMax = edge.m_center.mX + 3.f;
+			rect.mYMin = edge.m_center.mY - 3.f;
+			rect.mYMax = edge.m_center.mY + 3.f;
+			MOAIDraw::DrawEllipseFill(rect, 6);
+		}
 	}
 }
 

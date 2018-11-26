@@ -11,8 +11,9 @@ public:
 	{
 		struct Edge
 		{
-			int m_verts[2]; // Indices de m_verts
-			NavPolygon* m_pNeighbour;
+			int m_verts[2];           // Indexs of m_verts
+			NavPolygon* m_pNeighbour; // Other polygon
+			USVec2D m_center;         // Pathfinding: Center of edge
 		};
 		std::vector<USVec2D> m_verts;
 		std::vector<Edge> m_Edges;
