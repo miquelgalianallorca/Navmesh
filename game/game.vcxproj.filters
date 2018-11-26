@@ -22,6 +22,9 @@
     <ClCompile Include="pugixml\pugixml.cpp">
       <Filter>pugixml</Filter>
     </ClCompile>
+    <ClCompile Include="pathfinding\path.cpp">
+      <Filter>pathfinder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
@@ -44,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="pugixml\pugixml.hpp">
       <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinding\path.h">
+      <Filter>pathfinder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

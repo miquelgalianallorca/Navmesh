@@ -2,6 +2,7 @@
 #define __PATHFINDER_H__
 
 #include <moaicore/MOAIEntity2D.h>
+#include "path.h"
 
 class Pathfinder: public virtual MOAIEntity2D
 {
@@ -11,12 +12,13 @@ public:
 	{
 		struct Edge
 		{
-			int m_verts[2];           // Indexs of m_verts
+			int         m_verts[2];   // Indexs of m_verts
 			NavPolygon* m_pNeighbour; // Other polygon
-			USVec2D m_center;         // Pathfinding: Center of edge
+			USVec2D     m_center;     // Pathfinding: Center of edge
 		};
+
 		std::vector<USVec2D> m_verts;
-		std::vector<Edge> m_Edges;
+		std::vector<Edge>    m_Edges;
 		// TerrainType m_terreno;
 		// Otros: centro, área, plano, etc
 	};
@@ -26,24 +28,25 @@ public:
 
 	virtual void DrawDebug();
 
-	void SetStartPosition(float x, float y) { m_StartPosition = USVec2D(x, y); UpdatePath();}
-	void SetEndPosition(float x, float y) { m_EndPosition = USVec2D(x, y); UpdatePath();}
+	void SetStartPosition(float x, float y);
+	void SetEndPosition  (float x, float y);
 	const USVec2D& GetStartPosition() const { return m_StartPosition;}
-	const USVec2D& GetEndPosition() const { return m_EndPosition;}
+	const USVec2D& GetEndPosition()   const { return m_EndPosition;}
 
     bool PathfindStep();
+
 private:
 	void UpdatePath();
-private:
-	USVec2D m_StartPosition;
-	USVec2D m_EndPosition;
-
-	std::vector<NavPolygon> m_Navmesh;
-
+	bool LoadNavmesh(const char* filename);
 	void CreateEdges();
 
+	USVec2D m_StartPosition;
+	USVec2D m_EndPosition;
+	Path    path;
+	std::vector<NavPolygon> m_Navmesh;
 
-	// Lua configuration
+
+	// Lua configuration -------------------------------------------
 public:
 	DECL_LUA_FACTORY(Pathfinder)
 public:
@@ -52,7 +55,7 @@ private:
 	static int _setStartPosition(lua_State* L);
 	static int _setEndPosition(lua_State* L);
     static int _pathfindStep(lua_State* L);
+	// -------------------------------------------------------------
 };
-
 
 #endif

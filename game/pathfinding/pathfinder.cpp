@@ -2,17 +2,33 @@
 #include "pathfinder.h"
 #include "pugixml/pugixml.hpp"
 
+// P8
+
 Pathfinder::Pathfinder() : MOAIEntity2D()
 {
 	RTTI_BEGIN
 		RTTI_EXTEND(MOAIEntity2D)
 	RTTI_END
 
-	// Read file
+	// Load navmesh
 	const char* filename = "../sample/navmesh.xml";
+	if (LoadNavmesh(filename))
+		cout << "Navmesh loaded." << endl;
+
+	// Load path
+}
+
+Pathfinder::~Pathfinder()
+{
+
+}
+
+bool Pathfinder::LoadNavmesh(const char* filename)
+{
+	// Read file
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(filename);
-	
+
 	// Loading correct
 	if (result)
 	{
@@ -51,11 +67,8 @@ Pathfinder::Pathfinder() : MOAIEntity2D()
 	}
 	// Loading failed	
 	else cout << result.description() << endl;
-}
 
-Pathfinder::~Pathfinder()
-{
-
+	return result;
 }
 
 void Pathfinder::CreateEdges()
@@ -84,6 +97,43 @@ void Pathfinder::CreateEdges()
 void Pathfinder::UpdatePath()
 {
 	cout << "Update path" << endl;
+
+//	// Check if valid path
+//	if (!IsStartPositionSet || !IsEndPositionSet)
+//	{
+//		cout << "Path doesn't have start and end." << endl;
+//		return;
+//	}
+//
+//	// Mouse position to grid coords
+//	unsigned int posX, posY;
+//	path.WorldPosToCoord(m_StartPosition.mX, m_StartPosition.mY, squareSize, posX, posY);
+//	m_StartPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
+//	path.WorldPosToCoord(m_EndPosition.mX, m_EndPosition.mY, squareSize, posX, posY);
+//	m_EndPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
+//
+//	if (!path.IsValidCoord(m_StartPositionCoord) || !path.IsValidCoord(m_EndPositionCoord))
+//	{
+//		cout << "Invalid coords." << endl;
+//		return;
+//	}
+//
+//	// A*
+//	path.AStar(m_StartPositionCoord.mX, m_StartPositionCoord.mY,
+//		m_EndPositionCoord.mX, m_EndPositionCoord.mY);
+//}
+}
+
+void Pathfinder::SetStartPosition(float x, float y)
+{ 
+	m_StartPosition = USVec2D(x, y);
+	UpdatePath();
+}
+
+void Pathfinder::SetEndPosition(float x, float y)
+{
+	m_EndPosition = USVec2D(x, y);
+	UpdatePath();
 }
 
 void Pathfinder::DrawDebug()
@@ -111,6 +161,18 @@ void Pathfinder::DrawDebug()
 			MOAIDraw::DrawEllipseFill(rect, 6);
 		}
 	}
+
+	//// Draw start pos
+	//gfxDevice.SetPenColor(0.f, 1.f, 0.f, 1.f);
+	//float posX, posY;
+	//path.CoordToWorldPos(static_cast<unsigned int>(m_StartPositionCoord.mX), static_cast<unsigned int>(m_StartPositionCoord.mY),
+	//	squareSize, posX, posY);
+	//MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
+	//// Draw end pos
+	//gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
+	//path.CoordToWorldPos(static_cast<unsigned int>(m_EndPositionCoord.mX), static_cast<unsigned int>(m_EndPositionCoord.mY),
+	//	squareSize, posX, posY);
+	//MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
 }
 
 bool Pathfinder::PathfindStep()
