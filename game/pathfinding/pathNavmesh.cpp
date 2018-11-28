@@ -1,6 +1,7 @@
 #include <stdafx.h>
 #include <algorithm>
 #include "pathNavmesh.h"
+#include "pugixml/pugixml.hpp"
 
 PathNavmesh::~PathNavmesh()
 {
@@ -13,14 +14,6 @@ PathNavmesh::~PathNavmesh()
 
 void PathNavmesh::Load(const std::vector<Pathfinder::NavPolygon>& navmesh)
 {
-
-}
-
-void PathNavmesh::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
-{
-	this->rows = rows;
-	this->cols = cols;
-
 	// Clear previous nodes
 	for (Node* node : nodes)
 	{
@@ -28,26 +21,19 @@ void PathNavmesh::Load(const std::string& filename, const unsigned int rows, con
 	}
 	nodes.clear();
 	
-	// Read file
-	std::ifstream istream(filename, std::ios_base::binary);
-	std::stringstream sstream;
-	sstream << istream.rdbuf();
-	mapSrc = sstream.str();
-	// Sanitize
-	mapSrc.erase(std::remove(mapSrc.begin(), mapSrc.end(), '\n'), mapSrc.end());
-	mapSrc.erase(std::remove(mapSrc.begin(), mapSrc.end(), '\r'), mapSrc.end());
-
-	// Get nodes from map
-	for (size_t i = 0; i < mapSrc.length(); ++i)
+	// Get nodes from navmesh
+	for (const Pathfinder::NavPolygon& polygon : navmesh)
 	{
-		Node* node = new Node();
-		node->cost = static_cast<int>(mapSrc.at(i)) - static_cast<int>('0');
-		node->posY = i / cols;
-		node->posX = i % cols;
-		node->parent = nullptr;
-		node->g = 0.f;
-		node->f = 0.f;
-		nodes.push_back(node);
+		for (const Pathfinder::NavPolygon::Edge& edge : polygon.m_Edges)
+		{
+			Node* node = new Node();
+			node->cost = 1; // Cost of polygon: based on terrain type?
+			node->pos = edge.m_center;
+			node->parent = nullptr;
+			node->g = 0.f;
+			node->f = 0.f;
+			nodes.push_back(node);
+		}
 	}
 }
 

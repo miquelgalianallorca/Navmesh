@@ -7,14 +7,7 @@ class PathNavmesh
 public:
 	struct Node
 	{
-		Node() {}
-		Node(unsigned int _posX, unsigned int _posY, unsigned int _cost) :
-			posX(_posX),
-			posY(_posY),
-			cost(_cost),
-			parent(nullptr)
-		{}
-
+		USVec2D pos;
 		unsigned int posX;
 		unsigned int posY;   // Map grid location
 		int   cost;          // Traverse cost of grid location
@@ -33,8 +26,6 @@ public:
 	~PathNavmesh();
 	
 	void Load(const std::vector<Pathfinder::NavPolygon>& navmesh);
-
-	void Load(const std::string& filename, const unsigned int rows, const unsigned int cols);
 	bool AStar(const float startX, const float startY, const float endX, const float endY);
 	bool AStarStep();
 	void BuildPath(Node* node);

@@ -17,11 +17,13 @@ Pathfinder::Pathfinder() : MOAIEntity2D()
 		cout << "Navmesh loaded." << endl;
 
 	// Load path
+	path = new PathNavmesh();
+	path->Load(m_Navmesh);
 }
 
 Pathfinder::~Pathfinder()
 {
-
+	delete path;
 }
 
 bool Pathfinder::LoadNavmesh(const char* filename)
