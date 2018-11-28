@@ -18,7 +18,7 @@ Pathfinder::Pathfinder() : MOAIEntity2D()
 
 	// Load path
 	path = new PathNavmesh();
-	path->Load(m_Navmesh);
+	path->Load(&m_Navmesh);
 }
 
 Pathfinder::~Pathfinder()

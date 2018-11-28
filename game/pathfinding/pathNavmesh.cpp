@@ -5,24 +5,25 @@
 
 PathNavmesh::~PathNavmesh()
 {
+	navmesh = nullptr;
+
 	for (Node* node : nodes)
 		delete node;
 	nodes.clear();
 	path.clear();
 }
 
-
-void PathNavmesh::Load(const std::vector<Pathfinder::NavPolygon>& navmesh)
+void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh)
 {
+	navmesh = _navmesh;
+
 	// Clear previous nodes
 	for (Node* node : nodes)
-	{
 		delete node;
-	}
 	nodes.clear();
 	
 	// Get nodes from navmesh
-	for (const Pathfinder::NavPolygon& polygon : navmesh)
+	for (Pathfinder::NavPolygon& polygon : *navmesh)
 	{
 		for (const Pathfinder::NavPolygon::Edge& edge : polygon.m_Edges)
 		{
@@ -32,7 +33,10 @@ void PathNavmesh::Load(const std::vector<Pathfinder::NavPolygon>& navmesh)
 			node->parent = nullptr;
 			node->g = 0.f;
 			node->f = 0.f;
-			nodes.push_back(node);
+			node->neighbors[0] = &polygon;
+			node->neighbors[1] = edge.m_pNeighbour;
+
+			nodes.push_back(node);			
 		}
 	}
 }
@@ -80,8 +84,9 @@ bool PathNavmesh::AStar(const float startX, const float startY, const float endX
 
 	ResetNodes();
 
-	startNode = GetNodeAtPosition(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY));
-	endNode   = GetNodeAtPosition(static_cast<unsigned int>(endX),   static_cast<unsigned int>(endY));
+	// TO DO: start & end nodes
+	startNode = nullptr;
+	endNode   = nullptr;
 	openList.push_back(startNode);
 
 	if (!isStepByStepModeOn)
@@ -113,7 +118,7 @@ bool PathNavmesh::AStarStep()
 	openList.pop_front();
 	
 	// Connections
-	std::list<Node*> connections = GetConnections(node->posX, node->posY);
+	std::list<Node*> connections = GetConnections();
 	for (Node* next : connections)
 	{
 		// Connection is in closed list
@@ -153,75 +158,54 @@ void PathNavmesh::DrawDebug(const size_t& squareSize)
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
 	
-	// Paint node cost in red
-	for (const Node* node : nodes)
-	{
-		if (node->cost > 0)
-		{
-			float alpha = (node->cost) / 10.f;
-			gfxDevice.SetPenColor(alpha + .3f, 0.f, 0.f, .1f);
+	//// Paint node cost in red
+	//for (const Node* node : nodes)
+	//{
+	//	if (node->cost > 0)
+	//	{
+	//		float alpha = (node->cost) / 10.f;
+	//		gfxDevice.SetPenColor(alpha + .3f, 0.f, 0.f, .1f);
 
-			float wPosX, wPosY;
-			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
-		}
-	}	
+	//		float wPosX, wPosY;
+	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
+	//	}
+	//}	
 
-	// Paint A*
-	if (isStepByStepModeOn)
-	{
-		// Paint open nodes
-		for (const Node* node : openList)
-		{
-			gfxDevice.SetPenColor(0.f, 0.f, .3f, .1f);
-			float wPosX, wPosY;
-			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-		}
-		// Paint close nodes
-		for (const Node* node : closedList)
-		{
-			gfxDevice.SetPenColor(0.f, 0.3f, 0.f, .1f);
-			float wPosX, wPosY;
-			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-		}
-	}
-	else
-	{
-		// Paint path
-		for (const Node* node : path)
-		{
-			gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
-			float wPosX, wPosY;
-			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-		}
-	}
+	//// Paint A*
+	//if (isStepByStepModeOn)
+	//{
+	//	// Paint open nodes
+	//	for (const Node* node : openList)
+	//	{
+	//		gfxDevice.SetPenColor(0.f, 0.f, .3f, .1f);
+	//		float wPosX, wPosY;
+	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+	//	}
+	//	// Paint close nodes
+	//	for (const Node* node : closedList)
+	//	{
+	//		gfxDevice.SetPenColor(0.f, 0.3f, 0.f, .1f);
+	//		float wPosX, wPosY;
+	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+	//	}
+	//}
+	//else
+	//{
+	//	// Paint path
+	//	for (const Node* node : path)
+	//	{
+	//		gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
+	//		float wPosX, wPosY;
+	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+	//	}
+	//}
 }
 
-void PathNavmesh::CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY, const size_t squareSize,
-	float& OutPosX, float& OutPosY)
-{
-	// Top-left
-	float offsetX = -1.f * squareSize * GetCols();
-	float offsetY = -1.f * squareSize * GetRows();
-
-	OutPosX = offsetX + static_cast<float>(InPosX) * squareSize * 2;
-	OutPosY = offsetY + static_cast<float>(InPosY) * squareSize * 2;
-}
-
-void PathNavmesh::WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize,
-	unsigned int& OutPosX, unsigned int& OutPosY)
-{
-	float offsetX = -1.f * squareSize * GetCols();
-	float offsetY = -1.f * squareSize * GetRows();
-
-	OutPosX = static_cast<unsigned int>((InPosX - offsetX) / (squareSize * 2));
-	OutPosY = static_cast<unsigned int>((InPosY - offsetY) / (squareSize * 2));
-}
-
-std::list<PathNavmesh::Node*> PathNavmesh::GetConnections(unsigned int posX, unsigned int posY)
+std::list<PathNavmesh::Node*> PathNavmesh::GetConnections()
 {
 	// cout << "Get connections of: " << posX << " " << posY;
 	std::list<Node*> connections;
@@ -229,18 +213,18 @@ std::list<PathNavmesh::Node*> PathNavmesh::GetConnections(unsigned int posX, uns
 	{
 		// cout << "Elem x: " << elem.posX << " y: " << elem.posY << endl;
 
-		// Left
-		if (elem->posX == posX - 1 && elem->posY == posY)
-			connections.push_back(elem);
-		// Right
-		else if (elem->posX == posX + 1 && elem->posY == posY)
-			connections.push_back(elem);
-		// Up
-		else if (elem->posX == posX && elem->posY == posY - 1)
-			connections.push_back(elem);
-		// Down
-		else if (elem->posX == posX && elem->posY == posY + 1)
-			connections.push_back(elem);
+		//// Left
+		//if (elem->posX == posX - 1 && elem->posY == posY)
+		//	connections.push_back(elem);
+		//// Right
+		//else if (elem->posX == posX + 1 && elem->posY == posY)
+		//	connections.push_back(elem);
+		//// Up
+		//else if (elem->posX == posX && elem->posY == posY - 1)
+		//	connections.push_back(elem);
+		//// Down
+		//else if (elem->posX == posX && elem->posY == posY + 1)
+		//	connections.push_back(elem);
 	}
 
 	// cout << endl;
@@ -263,32 +247,9 @@ void PathNavmesh::BuildPath(Node* node)
 	cout << "Path built." << endl;
 }
 
-PathNavmesh::Node* PathNavmesh::GetNodeAtPosition(unsigned int posX, unsigned int posY)
-{
-	for (Node* node : nodes)
-	{
-		if (node->posX == posX && node->posY == posY)
-		{
-			return node;
-		}
-	}
-	return nullptr;
-}
-
 float PathNavmesh::Heuristics(const Node* next, const Node* goal)
 {
-	USVec2D nextPos = USVec2D(static_cast<float>(next->posX), static_cast<float>(next->posY));
-	USVec2D goalPos = USVec2D(static_cast<float>(goal->posX), static_cast<float>(goal->posY));
-
+	USVec2D nextPos = next->pos;
+	USVec2D goalPos = goal->pos;
 	return nextPos.Dist(goalPos);
-}
-
-bool PathNavmesh::IsValidCoord(const USVec2D pos)
-{
-	unsigned int x = static_cast<unsigned int>(pos.mX);
-	unsigned int y = static_cast<unsigned int>(pos.mY);
-	if (x >= 0 && x < cols && y >= 0 && y < rows)
-		return true;
-	else
-		return false;
 }
