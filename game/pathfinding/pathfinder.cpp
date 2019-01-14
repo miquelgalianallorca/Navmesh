@@ -101,6 +101,9 @@ void Pathfinder::UpdatePath()
 {
 	cout << "Update path" << endl;
 
+	if (path)
+		path->AStar(m_StartPosition, m_EndPosition);
+
 //	// Check if valid path
 //	if (!IsStartPositionSet || !IsEndPositionSet)
 //	{

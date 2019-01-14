@@ -25,7 +25,7 @@ public:
 	~PathNavmesh();
 	
 	void Load(std::vector<Pathfinder::NavPolygon>* navmesh);
-	bool AStar(const float startX, const float startY, const float endX, const float endY);
+	bool AStar(USVec2D start, USVec2D end);
 	bool AStarStep();
 	void BuildPath(Node* node);
 
@@ -55,5 +55,7 @@ private:
 	std::list<Node*> GetConnections();
 	void  ResetNodes();
 	float Heuristics(const Node* next, const Node* goal);
+
+	Node* GetClosestNode(const USVec2D& pos);
 	// ---------------------------------------------------------------------
 };

@@ -38,7 +38,7 @@ void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh)
 
 			nodes.push_back(node);			
 		}
-	}
+	}	
 }
 
 void PathNavmesh::ResetNodes()
@@ -56,8 +56,8 @@ void PathNavmesh::ResetNodes()
 }
 
 // Heuristics: Euclidean distance. Manhattan could give longer paths than necessary.
-// Start and end in map coords (not in screen coords)
-bool PathNavmesh::AStar(const float startX, const float startY, const float endX, const float endY)
+// Start and end in screen coords
+bool PathNavmesh::AStar(USVec2D start, USVec2D end)
 {	
 	/*
 	openlist
@@ -84,9 +84,11 @@ bool PathNavmesh::AStar(const float startX, const float startY, const float endX
 
 	ResetNodes();
 
-	// TO DO: start & end nodes
-	startNode = nullptr;
-	endNode   = nullptr;
+	// Set start & end nodes
+	startNode = GetClosestNode(start);
+	endNode   = GetClosestNode(end);
+	if (!startNode || !endNode)
+		return false;
 	openList.push_back(startNode);
 
 	if (!isStepByStepModeOn)
@@ -100,6 +102,22 @@ bool PathNavmesh::AStar(const float startX, const float startY, const float endX
 	}
 
 	return false;
+}
+
+PathNavmesh::Node* PathNavmesh::GetClosestNode(const USVec2D& pos)
+{
+	Node* closestNode = nullptr;
+	float closestDist = 99999.f;
+	for (Node* node : nodes)
+	{
+		float dist = node->pos.Dist(pos);
+		if (dist < closestDist)
+		{
+			closestNode = node;
+			closestDist = dist;
+		}
+	}
+	return closestNode;
 }
 
 bool PathNavmesh::AStarStep()
@@ -158,6 +176,18 @@ void PathNavmesh::DrawDebug(const size_t& squareSize)
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
 	
+	gfxDevice.SetPenColor(1.f, 0.f, 0.f, 1.f);
+	if (startNode)
+	{
+		USRect rect;
+		USVec2D pos = startNode->pos;
+		rect.mXMin = pos.mX - 6.f;
+		rect.mXMax = pos.mX + 6.f;
+		rect.mYMin = pos.mY - 6.f;
+		rect.mYMax = pos.mY + 6.f;
+		MOAIDraw::DrawEllipseFill(rect, 6);
+	}
+
 	//// Paint node cost in red
 	//for (const Node* node : nodes)
 	//{
@@ -209,25 +239,29 @@ std::list<PathNavmesh::Node*> PathNavmesh::GetConnections()
 {
 	// cout << "Get connections of: " << posX << " " << posY;
 	std::list<Node*> connections;
-	for (Node* elem : nodes)
+	for (const Node* elem : nodes)
 	{
-		// cout << "Elem x: " << elem.posX << " y: " << elem.posY << endl;
-
-		//// Left
-		//if (elem->posX == posX - 1 && elem->posY == posY)
-		//	connections.push_back(elem);
-		//// Right
-		//else if (elem->posX == posX + 1 && elem->posY == posY)
-		//	connections.push_back(elem);
-		//// Up
-		//else if (elem->posX == posX && elem->posY == posY - 1)
-		//	connections.push_back(elem);
-		//// Down
-		//else if (elem->posX == posX && elem->posY == posY + 1)
-		//	connections.push_back(elem);
+		Pathfinder::NavPolygon* pol0 = elem->neighbors[0];
+		Pathfinder::NavPolygon* pol1 = elem->neighbors[1];
+		if (pol0)
+		{
+			std::vector<Pathfinder::NavPolygon::Edge> edges = pol0->m_Edges;
+			for (Pathfinder::NavPolygon::Edge& edge : edges)
+			{
+				if (edge.m_center.Equals(elem->pos))
+					connections.push_back(elem);
+			}
+		}
+		/*if (pol1)
+		{
+			std::vector<Pathfinder::NavPolygon::Edge> edges = pol1->m_Edges;
+			for (Pathfinder::NavPolygon::Edge& edge : edges)
+			{
+				if (edge.m_center.Equals(elem->pos))
+					connections.push_back(elem);
+			}
+		}*/
 	}
-
-	// cout << endl;
 
 	return connections;
 }
