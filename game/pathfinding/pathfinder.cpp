@@ -168,17 +168,13 @@ void Pathfinder::DrawDebug()
 		}
 	}
 
-	//// Draw start pos
-	//gfxDevice.SetPenColor(0.f, 1.f, 0.f, 1.f);
-	//float posX, posY;
-	//path.CoordToWorldPos(static_cast<unsigned int>(m_StartPositionCoord.mX), static_cast<unsigned int>(m_StartPositionCoord.mY),
-	//	squareSize, posX, posY);
-	//MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
-	//// Draw end pos
-	//gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
-	//path.CoordToWorldPos(static_cast<unsigned int>(m_EndPositionCoord.mX), static_cast<unsigned int>(m_EndPositionCoord.mY),
-	//	squareSize, posX, posY);
-	//MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
+	// Draw start pos
+    const unsigned posHalfSize = 5;
+	gfxDevice.SetPenColor(1.f, 0.f, 0.f, 1.f);
+	MOAIDraw::DrawRectFill(m_StartPosition.mX - posHalfSize, m_StartPosition.mY - posHalfSize, m_StartPosition.mX + posHalfSize, m_StartPosition.mY + posHalfSize);
+	// Draw end pos
+    gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
+    MOAIDraw::DrawRectFill(m_EndPosition.mX - posHalfSize, m_EndPosition.mY - posHalfSize, m_EndPosition.mX + posHalfSize, m_EndPosition.mY + posHalfSize);
 }
 
 bool Pathfinder::PathfindStep()

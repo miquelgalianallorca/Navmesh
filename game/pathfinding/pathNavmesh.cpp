@@ -248,8 +248,8 @@ std::list<PathNavmesh::Node*> PathNavmesh::GetConnections()
 			std::vector<Pathfinder::NavPolygon::Edge> edges = pol0->m_Edges;
 			for (Pathfinder::NavPolygon::Edge& edge : edges)
 			{
-				if (edge.m_center.Equals(elem->pos))
-					connections.push_back(elem);
+				// if (edge.m_center.Equals(elem->pos))
+				//	connections.push_back(elem);
 			}
 		}
 		/*if (pol1)
