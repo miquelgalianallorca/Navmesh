@@ -38,7 +38,7 @@ void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh)
 
 			nodes.push_back(node);			
 		}
-	}	
+	}
 }
 
 void PathNavmesh::ResetNodes()
@@ -110,7 +110,7 @@ PathNavmesh::Node* PathNavmesh::GetClosestNode(const USVec2D& pos)
 	float closestDist = 99999.f;
 	for (Node* node : nodes)
 	{
-		float dist = node->pos.Dist(pos);
+		const float dist = node->pos.Dist(pos);
 		if (dist < closestDist)
 		{
 			closestNode = node;

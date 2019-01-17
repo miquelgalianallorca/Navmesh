@@ -5,7 +5,10 @@
 
 // P8
 
-Pathfinder::Pathfinder() : MOAIEntity2D()
+Pathfinder::Pathfinder() :
+    MOAIEntity2D(),
+    isStartPositionSet(false),
+    isEndPositionSet(false)
 {
 	RTTI_BEGIN
 		RTTI_EXTEND(MOAIEntity2D)
@@ -30,20 +33,20 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 {
 	// Read file
 	pugi::xml_document doc;
-	pugi::xml_parse_result result = doc.load_file(filename);
+	const pugi::xml_parse_result result = doc.load_file(filename);
 
 	// Loading correct
 	if (result)
 	{
 		// Load polygons
-		pugi::xml_node polygonsNode = doc.child("navmesh").child("polygons");
+		const pugi::xml_node polygonsNode = doc.child("navmesh").child("polygons");
 		for (pugi::xml_node polygonNode = polygonsNode.child("polygon"); polygonNode; polygonNode = polygonNode.next_sibling("polygon"))
 		{
 			NavPolygon polygon;
 			for (pugi::xml_node pointNode = polygonNode.child("point"); pointNode; pointNode = pointNode.next_sibling("point"))
 			{
-				float x = pointNode.attribute("x").as_float();
-				float y = pointNode.attribute("y").as_float();
+				const float x = pointNode.attribute("x").as_float();
+				const float y = pointNode.attribute("y").as_float();
 				polygon.m_verts.push_back(USVec2D(x, y));
 			}
 			m_Navmesh.push_back(polygon);
@@ -51,18 +54,18 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 		CreateEdges();
 
 		// Load links
-		pugi::xml_node linksNode = doc.child("navmesh").child("links");
+		const pugi::xml_node linksNode = doc.child("navmesh").child("links");
 		for (pugi::xml_node linkNode = linksNode.child("link"); linkNode; linkNode = linkNode.next_sibling("link"))
 		{
-			pugi::xml_node startNode = linkNode.child("start");
-			int s_polygon = startNode.attribute("polygon").as_int();
-			int s_edgestart = startNode.attribute("edgestart").as_int();
-			int s_edgeend = startNode.attribute("edgeend").as_int();
+			const pugi::xml_node startNode = linkNode.child("start");
+			const int s_polygon = startNode.attribute("polygon").as_int();
+			const int s_edgestart = startNode.attribute("edgestart").as_int();
+			const int s_edgeend = startNode.attribute("edgeend").as_int();
 
-			pugi::xml_node endNode = linkNode.child("end");
-			int e_polygon = endNode.attribute("polygon").as_int();
-			int e_edgestart = endNode.attribute("edgestart").as_int();
-			int e_edgeend = endNode.attribute("edgeend").as_int();
+			const pugi::xml_node endNode = linkNode.child("end");
+			const int e_polygon = endNode.attribute("polygon").as_int();
+			const int e_edgestart = endNode.attribute("edgestart").as_int();
+			const int e_edgeend = endNode.attribute("edgeend").as_int();
 
 			m_Navmesh[s_polygon].m_Edges[s_edgestart].m_pNeighbour = &m_Navmesh[e_polygon];
 			m_Navmesh[e_polygon].m_Edges[e_edgestart].m_pNeighbour = &m_Navmesh[s_polygon];
@@ -78,7 +81,7 @@ void Pathfinder::CreateEdges()
 {
 	for (NavPolygon& polygon : m_Navmesh)
 	{
-		size_t nVerts = polygon.m_verts.size();
+		const size_t nVerts = polygon.m_verts.size();
 		for (size_t i = 0; i < nVerts; ++i)
 		{
 			// Edge to previous vertex
@@ -100,46 +103,30 @@ void Pathfinder::CreateEdges()
 void Pathfinder::UpdatePath()
 {
 	cout << "Update path" << endl;
+    
+	// Check if valid path
+	if (!isStartPositionSet || !isEndPositionSet)
+	{
+		cout << "Path doesn't have start and end." << endl;
+		return;
+	}
 
-	if (path)
-		path->AStar(m_StartPosition, m_EndPosition);
-
-//	// Check if valid path
-//	if (!IsStartPositionSet || !IsEndPositionSet)
-//	{
-//		cout << "Path doesn't have start and end." << endl;
-//		return;
-//	}
-//
-//	// Mouse position to grid coords
-//	unsigned int posX, posY;
-//	path.WorldPosToCoord(m_StartPosition.mX, m_StartPosition.mY, squareSize, posX, posY);
-//	m_StartPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
-//	path.WorldPosToCoord(m_EndPosition.mX, m_EndPosition.mY, squareSize, posX, posY);
-//	m_EndPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
-//
-//	if (!path.IsValidCoord(m_StartPositionCoord) || !path.IsValidCoord(m_EndPositionCoord))
-//	{
-//		cout << "Invalid coords." << endl;
-//		return;
-//	}
-//
-//	// A*
-//	path.AStar(m_StartPositionCoord.mX, m_StartPositionCoord.mY,
-//		m_EndPositionCoord.mX, m_EndPositionCoord.mY);
-//}
+    if (path)
+        path->AStar(m_StartPosition, m_EndPosition);
 }
 
 void Pathfinder::SetStartPosition(float x, float y)
 { 
 	m_StartPosition = USVec2D(x, y);
+    isStartPositionSet = true;
 	UpdatePath();
 }
 
 void Pathfinder::SetEndPosition(float x, float y)
 {
 	m_EndPosition = USVec2D(x, y);
-	UpdatePath();
+    isEndPositionSet = true;
+    UpdatePath();
 }
 
 void Pathfinder::DrawDebug()
@@ -182,20 +169,6 @@ bool Pathfinder::PathfindStep()
     // returns true if pathfinding process finished
     return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //lua configuration ----------------------------------------------------------------//
 void Pathfinder::RegisterLuaFuncs(MOAILuaState& state)

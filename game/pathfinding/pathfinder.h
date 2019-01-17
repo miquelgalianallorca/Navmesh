@@ -24,7 +24,7 @@ public:
 	Pathfinder();
 	~Pathfinder();
 
-	virtual void DrawDebug();
+	virtual void DrawDebug() override;
 
 	void SetStartPosition(float x, float y);
 	void SetEndPosition  (float x, float y);
@@ -43,6 +43,8 @@ private:
 	class PathNavmesh* path;
 	std::vector<NavPolygon> m_Navmesh;
 
+    bool isStartPositionSet;
+    bool isEndPositionSet;
 
 	// Lua configuration -------------------------------------------
 public:
