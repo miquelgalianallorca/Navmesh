@@ -3,6 +3,13 @@
 #include "pathNavmesh.h"
 #include "pugixml/pugixml.hpp"
 
+PathNavmesh::PathNavmesh() :
+    isStepByStepModeOn(false),
+    startNode(nullptr),
+    endNode(nullptr),
+    navmesh(nullptr)
+{}
+
 PathNavmesh::~PathNavmesh()
 {
 	navmesh = nullptr;
@@ -13,9 +20,10 @@ PathNavmesh::~PathNavmesh()
 	path.clear();
 }
 
-void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh)
+void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh, std::vector<Pathfinder::Link>* _links)
 {
 	navmesh = _navmesh;
+    links   = _links;
 
 	// Clear previous nodes
 	for (Node* node : nodes)
@@ -23,21 +31,23 @@ void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh)
 	nodes.clear();
 	
 	// Get nodes from navmesh
-	for (Pathfinder::NavPolygon& polygon : *navmesh)
+    for (int i = 0; i < navmesh->size(); ++i)
 	{
-		for (const Pathfinder::NavPolygon::Edge& edge : polygon.m_Edges)
-		{
-			Node* node = new Node();
-			node->cost = 1; // Cost of polygon: based on terrain type?
-			node->pos = edge.m_center;
-			node->parent = nullptr;
-			node->g = 0.f;
-			node->f = 0.f;
-			node->neighbors[0] = &polygon;
-			node->neighbors[1] = edge.m_pNeighbour;
+        Pathfinder::NavPolygon& polygon = navmesh->at(i);
 
-			nodes.push_back(node);			
-		}
+        // Each polygon is a node
+        Node* node = new Node();
+        node->cost  = 1;
+        node->navmeshIndex = i;
+        
+        // Node position: centroid of verts
+        USVec2D centroid(0.f, 0.f);
+        for (const USVec2D& vert : polygon.m_verts)
+            centroid += vert;
+        centroid /= polygon.m_verts.size();
+        node->pos = centroid;
+
+        nodes.push_back(node);
 	}
 }
 
@@ -136,7 +146,7 @@ bool PathNavmesh::AStarStep()
 	openList.pop_front();
 	
 	// Connections
-	std::list<Node*> connections = GetConnections();
+	std::list<Node*> connections = GetConnections(node);
 	for (Node* next : connections)
 	{
 		// Connection is in closed list
@@ -151,7 +161,7 @@ bool PathNavmesh::AStarStep()
 		if (it != openList.end())
 		{
 			// Update cost in open list if smaller
-			float newCost = node->g + next->cost;
+			const float newCost = node->g + next->cost;
 			if (newCost < (*it)->g)
 			{
 				(*it)->g = newCost;
@@ -235,33 +245,25 @@ void PathNavmesh::DrawDebug(const size_t& squareSize)
 	//}
 }
 
-std::list<PathNavmesh::Node*> PathNavmesh::GetConnections()
+std::list<PathNavmesh::Node*> PathNavmesh::GetConnections(const Node* node)
 {
 	// cout << "Get connections of: " << posX << " " << posY;
 	std::list<Node*> connections;
-	for (const Node* elem : nodes)
-	{
-		Pathfinder::NavPolygon* pol0 = elem->neighbors[0];
-		Pathfinder::NavPolygon* pol1 = elem->neighbors[1];
-		if (pol0)
-		{
-			std::vector<Pathfinder::NavPolygon::Edge> edges = pol0->m_Edges;
-			for (Pathfinder::NavPolygon::Edge& edge : edges)
-			{
-				// if (edge.m_center.Equals(elem->pos))
-				//	connections.push_back(elem);
-			}
-		}
-		/*if (pol1)
-		{
-			std::vector<Pathfinder::NavPolygon::Edge> edges = pol1->m_Edges;
-			for (Pathfinder::NavPolygon::Edge& edge : edges)
-			{
-				if (edge.m_center.Equals(elem->pos))
-					connections.push_back(elem);
-			}
-		}*/
-	}
+    if (!node) return connections;
+
+    const Pathfinder::NavPolygon& polygon = navmesh->at(node->navmeshIndex);
+    for (const Pathfinder::NavPolygon::Edge& edge : polygon.m_Edges)
+    {
+        const int neighbourIndex = edge.m_neighbourIndex;
+        for (Node* n : nodes)
+        {
+            if (n->navmeshIndex == neighbourIndex)
+            {
+                connections.push_back(n);
+                break;
+            }
+        }
+    }
 
 	return connections;
 }

@@ -7,6 +7,8 @@ class PathNavmesh
 public:
 	struct Node
 	{
+        Node() : cost(0), parent(nullptr), g(0.f), f(0.f), navmeshIndex(-1) {}
+
 		USVec2D pos; // World location
 		int   cost;  // Traverse cost of grid location
 
@@ -14,17 +16,13 @@ public:
 		float g;             // Cost from origin to pos
 		float f;             // f = g + h, h = Estimated cost from pos to goal
 
-		// Neighbouring polygons
-		Pathfinder::NavPolygon* neighbors[2];
-	};
+        int navmeshIndex;
+	};    
 
-	PathNavmesh() :
-		isStepByStepModeOn(false)
-	{}
-
+    PathNavmesh();
 	~PathNavmesh();
 	
-	void Load(std::vector<Pathfinder::NavPolygon>* navmesh);
+	void Load(std::vector<Pathfinder::NavPolygon>* navmesh, std::vector<Pathfinder::Link>* links);
 	bool AStar(USVec2D start, USVec2D end);
 	bool AStarStep();
 	void BuildPath(Node* node);
@@ -41,6 +39,7 @@ private:
 
 	// Navmesh variables
 	std::vector<Pathfinder::NavPolygon>* navmesh;
+    std::vector<Pathfinder::Link>* links;
 	std::vector<Node*> nodes;
 
 	// false: P1 - true: P2
@@ -52,7 +51,7 @@ private:
 		return (first->f < second->f);
 	}
 	
-	std::list<Node*> GetConnections();
+	std::list<Node*> GetConnections(const Node* node);
 	void  ResetNodes();
 	float Heuristics(const Node* next, const Node* goal);
 

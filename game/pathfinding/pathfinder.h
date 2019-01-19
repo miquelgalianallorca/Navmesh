@@ -11,7 +11,8 @@ public:
 		struct Edge
 		{
 			int         m_verts[2];   // Indexs of m_verts
-			NavPolygon* m_pNeighbour; // Other polygon
+			// NavPolygon* m_pNeighbour; // Other polygon
+            int         m_neighbourIndex;
 			USVec2D     m_center;     // Pathfinding: Center of edge
 		};
 
@@ -20,7 +21,18 @@ public:
 		// TerrainType m_terreno;
 		// Otros: centro, área, plano, etc
 	};
-	
+
+    struct Link
+    {
+        int start_polygon;
+        int start_edgeStart;
+        int start_edgeEnd;
+    
+        int end_polygon;
+        int end_edgeStart;
+        int end_edgeEnd;
+    };
+
 	Pathfinder();
 	~Pathfinder();
 
@@ -28,8 +40,8 @@ public:
 
 	void SetStartPosition(float x, float y);
 	void SetEndPosition  (float x, float y);
-	const USVec2D& GetStartPosition() const { return m_StartPosition;}
-	const USVec2D& GetEndPosition()   const { return m_EndPosition;}
+	const USVec2D& GetStartPosition() const { return m_startPosition;}
+	const USVec2D& GetEndPosition()   const { return m_endPosition;}
 
     bool PathfindStep();
 
@@ -38,13 +50,15 @@ private:
 	bool LoadNavmesh(const char* filename);
 	void CreateEdges();
 
-	USVec2D m_StartPosition;
-	USVec2D m_EndPosition;
-	class PathNavmesh* path;
-	std::vector<NavPolygon> m_Navmesh;
+	USVec2D m_startPosition;
+	USVec2D m_endPosition;
+	class PathNavmesh* m_path;
 
-    bool isStartPositionSet;
-    bool isEndPositionSet;
+	std::vector<NavPolygon> m_navmesh;
+    std::vector<Link> m_links;
+
+    bool m_isStartPositionSet;
+    bool m_isEndPositionSet;
 
 	// Lua configuration -------------------------------------------
 public:

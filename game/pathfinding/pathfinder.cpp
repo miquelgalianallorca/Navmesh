@@ -7,8 +7,8 @@
 
 Pathfinder::Pathfinder() :
     MOAIEntity2D(),
-    isStartPositionSet(false),
-    isEndPositionSet(false)
+    m_isStartPositionSet(false),
+    m_isEndPositionSet(false)
 {
 	RTTI_BEGIN
 		RTTI_EXTEND(MOAIEntity2D)
@@ -20,13 +20,13 @@ Pathfinder::Pathfinder() :
 		cout << "Navmesh loaded." << endl;
 
 	// Load path
-	path = new PathNavmesh();
-	path->Load(&m_Navmesh);
+	m_path = new PathNavmesh();
+	m_path->Load(&m_navmesh, &m_links);
 }
 
 Pathfinder::~Pathfinder()
 {
-	delete path;
+	delete m_path;
 }
 
 bool Pathfinder::LoadNavmesh(const char* filename)
@@ -49,7 +49,7 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 				const float y = pointNode.attribute("y").as_float();
 				polygon.m_verts.push_back(USVec2D(x, y));
 			}
-			m_Navmesh.push_back(polygon);
+			m_navmesh.push_back(polygon);
 		}
 		CreateEdges();
 
@@ -57,18 +57,25 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 		const pugi::xml_node linksNode = doc.child("navmesh").child("links");
 		for (pugi::xml_node linkNode = linksNode.child("link"); linkNode; linkNode = linkNode.next_sibling("link"))
 		{
+            Link link;
 			const pugi::xml_node startNode = linkNode.child("start");
-			const int s_polygon = startNode.attribute("polygon").as_int();
-			const int s_edgestart = startNode.attribute("edgestart").as_int();
-			const int s_edgeend = startNode.attribute("edgeend").as_int();
+            link.start_polygon   = startNode.attribute("polygon").as_int();
+			link.start_edgeStart = startNode.attribute("edgestart").as_int();
+			link.start_edgeEnd   = startNode.attribute("edgeend").as_int();
 
 			const pugi::xml_node endNode = linkNode.child("end");
-			const int e_polygon = endNode.attribute("polygon").as_int();
-			const int e_edgestart = endNode.attribute("edgestart").as_int();
-			const int e_edgeend = endNode.attribute("edgeend").as_int();
+			link.end_polygon   = endNode.attribute("polygon").as_int();
+			link.end_edgeStart = endNode.attribute("edgestart").as_int();
+			link.end_edgeEnd   = endNode.attribute("edgeend").as_int();
 
-			m_Navmesh[s_polygon].m_Edges[s_edgestart].m_pNeighbour = &m_Navmesh[e_polygon];
-			m_Navmesh[e_polygon].m_Edges[e_edgestart].m_pNeighbour = &m_Navmesh[s_polygon];
+            // -- ??
+			/*m_navmesh[link.start_polygon].m_Edges[link.start_edgeStart].m_pNeighbour = &m_navmesh[link.end_polygon];
+			m_navmesh[link.end_polygon].m_Edges[link.end_edgeStart].m_pNeighbour = &m_navmesh[link.start_polygon];*/
+            m_navmesh[link.start_polygon].m_Edges[link.start_edgeStart].m_neighbourIndex = link.end_polygon;
+            m_navmesh[link.end_polygon].m_Edges[link.end_edgeStart].m_neighbourIndex = link.start_polygon;
+            // -- ??
+
+            m_links.push_back(link);
 		}
 	}
 	// Loading failed	
@@ -79,7 +86,7 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 
 void Pathfinder::CreateEdges()
 {
-	for (NavPolygon& polygon : m_Navmesh)
+	for (NavPolygon& polygon : m_navmesh)
 	{
 		const size_t nVerts = polygon.m_verts.size();
 		for (size_t i = 0; i < nVerts; ++i)
@@ -91,8 +98,8 @@ void Pathfinder::CreateEdges()
 			edge.m_verts[1] = i;
 
 			// Center of edge
-			float centerX = (polygon.m_verts[edge.m_verts[0]].mX + polygon.m_verts[edge.m_verts[1]].mX) / 2;
-			float centerY = (polygon.m_verts[edge.m_verts[0]].mY + polygon.m_verts[edge.m_verts[1]].mY) / 2;
+			const float centerX = (polygon.m_verts[edge.m_verts[0]].mX + polygon.m_verts[edge.m_verts[1]].mX) / 2;
+			const float centerY = (polygon.m_verts[edge.m_verts[0]].mY + polygon.m_verts[edge.m_verts[1]].mY) / 2;
 			edge.m_center = USVec2D(centerX, centerY);
 
 			polygon.m_Edges.push_back(edge);
@@ -105,27 +112,27 @@ void Pathfinder::UpdatePath()
 	cout << "Update path" << endl;
     
 	// Check if valid path
-	if (!isStartPositionSet || !isEndPositionSet)
+	if (!m_isStartPositionSet || !m_isEndPositionSet)
 	{
 		cout << "Path doesn't have start and end." << endl;
 		return;
 	}
 
-    if (path)
-        path->AStar(m_StartPosition, m_EndPosition);
+    if (m_path)
+        m_path->AStar(m_startPosition, m_endPosition);
 }
 
 void Pathfinder::SetStartPosition(float x, float y)
 { 
-	m_StartPosition = USVec2D(x, y);
-    isStartPositionSet = true;
+	m_startPosition = USVec2D(x, y);
+    m_isStartPositionSet = true;
 	UpdatePath();
 }
 
 void Pathfinder::SetEndPosition(float x, float y)
 {
-	m_EndPosition = USVec2D(x, y);
-    isEndPositionSet = true;
+	m_endPosition = USVec2D(x, y);
+    m_isEndPositionSet = true;
     UpdatePath();
 }
 
@@ -135,7 +142,7 @@ void Pathfinder::DrawDebug()
 	
 	// Draw navmesh
 	gfxDevice.SetPenWidth(2.f);
-	for (NavPolygon& polygon : m_Navmesh)
+	for (NavPolygon& polygon : m_navmesh)
 	{
 		gfxDevice.SetPenColor(.2f, .3f, 0.f, .1f);
 		MOAIDraw::DrawPolygonFilled(polygon.m_verts);
@@ -158,10 +165,10 @@ void Pathfinder::DrawDebug()
 	// Draw start pos
     const unsigned posHalfSize = 5;
 	gfxDevice.SetPenColor(1.f, 0.f, 0.f, 1.f);
-	MOAIDraw::DrawRectFill(m_StartPosition.mX - posHalfSize, m_StartPosition.mY - posHalfSize, m_StartPosition.mX + posHalfSize, m_StartPosition.mY + posHalfSize);
+	MOAIDraw::DrawRectFill(m_startPosition.mX - posHalfSize, m_startPosition.mY - posHalfSize, m_startPosition.mX + posHalfSize, m_startPosition.mY + posHalfSize);
 	// Draw end pos
     gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
-    MOAIDraw::DrawRectFill(m_EndPosition.mX - posHalfSize, m_EndPosition.mY - posHalfSize, m_EndPosition.mX + posHalfSize, m_EndPosition.mY + posHalfSize);
+    MOAIDraw::DrawRectFill(m_endPosition.mX - posHalfSize, m_endPosition.mY - posHalfSize, m_endPosition.mX + posHalfSize, m_endPosition.mY + posHalfSize);
 }
 
 bool Pathfinder::PathfindStep()
