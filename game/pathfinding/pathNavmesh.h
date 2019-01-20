@@ -27,7 +27,7 @@ public:
 	bool AStarStep();
 	void BuildPath(Node* node);
 
-	void DrawDebug(const size_t& squareSize);
+	void DrawDebug();
 
 private:
 	// A* variables
@@ -42,6 +42,8 @@ private:
     std::vector<Pathfinder::Link>* links;
 	std::vector<Node*> nodes;
 
+    std::vector<USVec2D> pathPoints;
+
 	// false: P1 - true: P2
 	bool isStepByStepModeOn;
 	
@@ -53,8 +55,9 @@ private:
 	
 	std::list<Node*> GetConnections(const Node* node);
 	void  ResetNodes();
-	float Heuristics(const Node* next, const Node* goal);
+	float Heuristics(const Node* next, const Node* goal) const;
 
-	Node* GetClosestNode(const USVec2D& pos);
+	Node* GetClosestNode(const USVec2D& pos) const;
+    USVec2D GetMidEdgePoint(const Node* node) const;
 	// ---------------------------------------------------------------------
 };

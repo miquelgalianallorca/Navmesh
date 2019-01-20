@@ -169,6 +169,9 @@ void Pathfinder::DrawDebug()
 	// Draw end pos
     gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
     MOAIDraw::DrawRectFill(m_endPosition.mX - posHalfSize, m_endPosition.mY - posHalfSize, m_endPosition.mX + posHalfSize, m_endPosition.mY + posHalfSize);
+
+    // Draw path
+    m_path->DrawDebug();
 }
 
 bool Pathfinder::PathfindStep()

@@ -114,7 +114,7 @@ bool PathNavmesh::AStar(USVec2D start, USVec2D end)
 	return false;
 }
 
-PathNavmesh::Node* PathNavmesh::GetClosestNode(const USVec2D& pos)
+PathNavmesh::Node* PathNavmesh::GetClosestNode(const USVec2D& pos) const
 {
 	Node* closestNode = nullptr;
 	float closestDist = 99999.f;
@@ -182,67 +182,26 @@ bool PathNavmesh::AStarStep()
 	return false;
 }
 
-void PathNavmesh::DrawDebug(const size_t& squareSize)
+void PathNavmesh::DrawDebug()
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
-	
-	gfxDevice.SetPenColor(1.f, 0.f, 0.f, 1.f);
-	if (startNode)
-	{
-		USRect rect;
-		USVec2D pos = startNode->pos;
-		rect.mXMin = pos.mX - 6.f;
-		rect.mXMax = pos.mX + 6.f;
-		rect.mYMin = pos.mY - 6.f;
-		rect.mYMax = pos.mY + 6.f;
-		MOAIDraw::DrawEllipseFill(rect, 6);
-	}
+	gfxDevice.SetPenColor(1.f, 0.f, .5f, 1.f);
 
-	//// Paint node cost in red
-	//for (const Node* node : nodes)
-	//{
-	//	if (node->cost > 0)
-	//	{
-	//		float alpha = (node->cost) / 10.f;
-	//		gfxDevice.SetPenColor(alpha + .3f, 0.f, 0.f, .1f);
+    // Draw points to follow
+    for (unsigned i = 0; i < pathPoints.size(); ++i)
+    {
+        USVec2D& pos = pathPoints.at(i);
 
-	//		float wPosX, wPosY;
-	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
-	//	}
-	//}	
+        USRect rect;
+        rect.mXMin = pos.mX - 6.f;
+        rect.mXMax = pos.mX + 6.f;
+        rect.mYMin = pos.mY - 6.f;
+        rect.mYMax = pos.mY + 6.f;
+        MOAIDraw::DrawEllipseFill(rect, 6);
 
-	//// Paint A*
-	//if (isStepByStepModeOn)
-	//{
-	//	// Paint open nodes
-	//	for (const Node* node : openList)
-	//	{
-	//		gfxDevice.SetPenColor(0.f, 0.f, .3f, .1f);
-	//		float wPosX, wPosY;
-	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-	//	}
-	//	// Paint close nodes
-	//	for (const Node* node : closedList)
-	//	{
-	//		gfxDevice.SetPenColor(0.f, 0.3f, 0.f, .1f);
-	//		float wPosX, wPosY;
-	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-	//	}
-	//}
-	//else
-	//{
-	//	// Paint path
-	//	for (const Node* node : path)
-	//	{
-	//		gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
-	//		float wPosX, wPosY;
-	//		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-	//		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
-	//	}
-	//}
+        if (i < pathPoints.size() - 1)
+            MOAIDraw::DrawLine(pos, pathPoints.at(i + 1));
+    }
 }
 
 std::list<PathNavmesh::Node*> PathNavmesh::GetConnections(const Node* node)
@@ -271,21 +230,48 @@ std::list<PathNavmesh::Node*> PathNavmesh::GetConnections(const Node* node)
 void PathNavmesh::BuildPath(Node* node)
 {
 	path.clear();
+    pathPoints.clear();
 
-	cout << "Building path..." << endl;
+	std::cout << "Building path..." << endl;
 	while (node->parent != nullptr)
 	{
 		path.push_back(node);
+
+        // Locations for pathfollowing
+        pathPoints.push_back(node->pos);
+        if (node->parent)
+            pathPoints.push_back(GetMidEdgePoint(node));
+
 		node = node->parent;
 	}
 	path.push_back(node);
+    pathPoints.push_back(startNode->pos);
 
-	cout << "Path built." << endl;
+	std::cout << "Path built." << endl;
 }
 
-float PathNavmesh::Heuristics(const Node* next, const Node* goal)
+float PathNavmesh::Heuristics(const Node* next, const Node* goal) const
 {
 	USVec2D nextPos = next->pos;
 	USVec2D goalPos = goal->pos;
 	return nextPos.Dist(goalPos);
+}
+
+USVec2D PathNavmesh::GetMidEdgePoint(const Node* node) const
+{
+    USVec2D point;
+
+    const int nodeIndex = node->navmeshIndex;
+    const int parentIndex = node->parent->navmeshIndex;
+    
+    for (auto& edge : navmesh->at(parentIndex).m_Edges)
+    {
+        if (edge.m_neighbourIndex == nodeIndex)
+        {
+            point = edge.m_center;
+            break;
+        }
+    }
+
+    return point;
 }
