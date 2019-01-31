@@ -136,6 +136,9 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="steering\params.cpp" />
+    <ClCompile Include="steering\steeringPathFollow.cpp" />
+    <ClCompile Include="steering\steeringSeek.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
@@ -149,6 +152,10 @@
     <ClInclude Include="pugixml\pugiconfig.hpp" />
     <ClInclude Include="pugixml\pugixml.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="steering\params.h" />
+    <ClInclude Include="steering\steering.h" />
+    <ClInclude Include="steering\steeringPathFollow.h" />
+    <ClInclude Include="steering\steeringSeek.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample\test.lua" />

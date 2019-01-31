@@ -28,6 +28,15 @@
     <ClCompile Include="pathfinding\pathNavmesh.cpp">
       <Filter>pathfinder</Filter>
     </ClCompile>
+    <ClCompile Include="steering\steeringPathFollow.cpp">
+      <Filter>steering</Filter>
+    </ClCompile>
+    <ClCompile Include="steering\steeringSeek.cpp">
+      <Filter>steering</Filter>
+    </ClCompile>
+    <ClCompile Include="steering\params.cpp">
+      <Filter>steering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
@@ -57,6 +66,18 @@
     <ClInclude Include="pathfinding\pathNavmesh.h">
       <Filter>pathfinder</Filter>
     </ClInclude>
+    <ClInclude Include="steering\steering.h">
+      <Filter>steering</Filter>
+    </ClInclude>
+    <ClInclude Include="steering\steeringPathFollow.h">
+      <Filter>steering</Filter>
+    </ClInclude>
+    <ClInclude Include="steering\steeringSeek.h">
+      <Filter>steering</Filter>
+    </ClInclude>
+    <ClInclude Include="steering\params.h">
+      <Filter>steering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="host">
@@ -70,6 +91,9 @@
     </Filter>
     <Filter Include="pugixml">
       <UniqueIdentifier>{1f6f9af2-1640-4bc5-b74a-dc8f3229c441}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="steering">
+      <UniqueIdentifier>{c1cc83bd-2dbd-42ec-b8ba-7c01a02b26e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

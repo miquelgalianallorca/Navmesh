@@ -22,10 +22,16 @@ public:
 	
 	USVec2D GetLinearVelocity() const { return mLinearVelocity;}
 	float GetAngularVelocity() const { return mAngularVelocity;}
+
+    float GetMaxVelocity() const { return mMaxVelocity; }
+    float GetMaxAcceleration() const { return mMaxAcceleration; }
+
 private:
 	USVec2D mLinearVelocity;
 	float mAngularVelocity;
-	
+    
+    float mMaxVelocity;
+    float mMaxAcceleration;
 	
 	
 	// Lua configuration
