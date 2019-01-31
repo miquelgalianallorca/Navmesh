@@ -20,6 +20,8 @@ public:
 		std::vector<Edge>    m_Edges;
 		// TerrainType m_terreno;
 		// Otros: centro, área, plano, etc
+
+        int GetEdgeIndex(const int startVert, const int endVert) const;
 	};
 
     struct Link

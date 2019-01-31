@@ -29,6 +29,17 @@ Pathfinder::~Pathfinder()
 	delete m_path;
 }
 
+int Pathfinder::NavPolygon::GetEdgeIndex(const int startVert, const int endVert) const
+{
+    for (int i = 0; i < m_Edges.size(); ++i)
+    {
+        const Edge& edge = m_Edges.at(i);
+        if (edge.m_verts[0] == startVert && edge.m_verts[1] == endVert)
+            return i;
+    }
+    return -1;
+}
+
 bool Pathfinder::LoadNavmesh(const char* filename)
 {
 	// Read file
@@ -68,13 +79,12 @@ bool Pathfinder::LoadNavmesh(const char* filename)
 			link.end_edgeStart = endNode.attribute("edgestart").as_int();
 			link.end_edgeEnd   = endNode.attribute("edgeend").as_int();
 
-            // -- ??
-			/*m_navmesh[link.start_polygon].m_Edges[link.start_edgeStart].m_pNeighbour = &m_navmesh[link.end_polygon];
-			m_navmesh[link.end_polygon].m_Edges[link.end_edgeStart].m_pNeighbour = &m_navmesh[link.start_polygon];*/
-            m_navmesh[link.start_polygon].m_Edges[link.start_edgeStart].m_neighbourIndex = link.end_polygon;
-            m_navmesh[link.end_polygon].m_Edges[link.end_edgeStart].m_neighbourIndex = link.start_polygon;
-            // -- ??
-
+            // Link
+            int start_polygon_edge_index = m_navmesh[link.start_polygon].GetEdgeIndex(link.start_edgeStart, link.start_edgeEnd);
+            m_navmesh[link.start_polygon].m_Edges[start_polygon_edge_index].m_neighbourIndex = link.end_polygon;            
+            int end_polygon_edge_index = m_navmesh[link.end_polygon].GetEdgeIndex(link.end_edgeStart, link.end_edgeEnd);
+            m_navmesh[link.end_polygon].m_Edges[end_polygon_edge_index].m_neighbourIndex = link.start_polygon;
+            
             m_links.push_back(link);
 		}
 	}
