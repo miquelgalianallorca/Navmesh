@@ -48,6 +48,7 @@ layer:setDrawDebug(debug)
 pathfinder = Pathfinder.new()
 pathfinder:setStartPosition(5, 10)
 pathfinder:setEndPosition(20, 40)
+pathfinder:setCharacter(entity)
 
 -- Add this character to draw debug
 MOAIDrawDebug.insertEntity(pathfinder)

@@ -1,5 +1,6 @@
 #include <stdafx.h>
 #include "pathfinder.h"
+#include "character.h"
 #include "pathNavmesh.h"
 #include "pugixml/pugixml.hpp"
 
@@ -31,7 +32,7 @@ Pathfinder::~Pathfinder()
 
 int Pathfinder::NavPolygon::GetEdgeIndex(const int startVert, const int endVert) const
 {
-    for (int i = 0; i < m_Edges.size(); ++i)
+    for (unsigned i = 0; i < m_Edges.size(); ++i)
     {
         const Edge& edge = m_Edges.at(i);
         if (edge.m_verts[0] == startVert && edge.m_verts[1] == endVert)
@@ -199,6 +200,7 @@ void Pathfinder::RegisterLuaFuncs(MOAILuaState& state)
 		{ "setStartPosition",		_setStartPosition},
 		{ "setEndPosition",			_setEndPosition},
         { "pathfindStep",           _pathfindStep},
+        { "setCharacter",           _setCharacter},
 		{ NULL, NULL }
 	};
 
@@ -230,5 +232,13 @@ int Pathfinder::_pathfindStep(lua_State* L)
     MOAI_LUA_SETUP(Pathfinder, "U")
 
     self->PathfindStep();
+    return 0;
+}
+
+int Pathfinder::_setCharacter(lua_State* L)
+{
+    MOAI_LUA_SETUP(Pathfinder, "U")
+
+    self->character = state.GetLuaObject<Character>(2, 0.0f);
     return 0;
 }

@@ -3,6 +3,8 @@
 
 #include <moaicore/MOAIEntity2D.h>
 
+class Character;
+
 class Pathfinder: public virtual MOAIEntity2D
 {
 public:
@@ -62,6 +64,8 @@ private:
     bool m_isStartPositionSet;
     bool m_isEndPositionSet;
 
+    Character* character;
+
 	// Lua configuration -------------------------------------------
 public:
 	DECL_LUA_FACTORY(Pathfinder)
@@ -71,6 +75,7 @@ private:
 	static int _setStartPosition(lua_State* L);
 	static int _setEndPosition(lua_State* L);
     static int _pathfindStep(lua_State* L);
+    static int _setCharacter(lua_State* L);
 	// -------------------------------------------------------------
 };
 

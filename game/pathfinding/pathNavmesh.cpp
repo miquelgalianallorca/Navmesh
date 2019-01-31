@@ -31,7 +31,7 @@ void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh, std::vecto
 	nodes.clear();
 	
 	// Get nodes from navmesh
-    for (int i = 0; i < navmesh->size(); ++i)
+    for (unsigned i = 0; i < navmesh->size(); ++i)
 	{
         Pathfinder::NavPolygon& polygon = navmesh->at(i);
 
@@ -44,7 +44,7 @@ void PathNavmesh::Load(std::vector<Pathfinder::NavPolygon>* _navmesh, std::vecto
         USVec2D centroid(0.f, 0.f);
         for (const USVec2D& vert : polygon.m_verts)
             centroid += vert;
-        centroid /= polygon.m_verts.size();
+        centroid /= static_cast<float>(polygon.m_verts.size());
         node->pos = centroid;
 
         nodes.push_back(node);
