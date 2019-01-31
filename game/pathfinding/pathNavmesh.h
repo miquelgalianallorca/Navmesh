@@ -36,6 +36,7 @@ private:
 	std::list<Node*> path;
 	Node* startNode;
 	Node* endNode;
+    USVec2D endPos;
 
 	// Navmesh variables
 	std::vector<Pathfinder::NavPolygon>* navmesh;

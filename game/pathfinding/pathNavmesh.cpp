@@ -93,6 +93,7 @@ bool PathNavmesh::AStar(USVec2D start, USVec2D end)
 	*/
 
 	ResetNodes();
+    endPos = end;
 
 	// Set start & end nodes
 	startNode = GetClosestNode(start);
@@ -231,9 +232,10 @@ void PathNavmesh::BuildPath(Node* node)
 {
 	path.clear();
     pathPoints.clear();
-
+        
 	std::cout << "Building path..." << endl;
-	while (node->parent != nullptr)
+    pathPoints.push_back(endPos);
+    while (node->parent != nullptr)
 	{
 		path.push_back(node);
 
@@ -246,7 +248,7 @@ void PathNavmesh::BuildPath(Node* node)
 	}
 	path.push_back(node);
     pathPoints.push_back(startNode->pos);
-
+    
 	std::cout << "Path built." << endl;
 }
 
