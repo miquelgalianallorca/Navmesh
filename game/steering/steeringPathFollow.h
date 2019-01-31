@@ -8,7 +8,7 @@ public:
     SteeringPathFollow()  {}
     ~SteeringPathFollow() {}
 
-    bool ReadPath(const char* filename);
+    // bool ReadPath(const char* filename);
     void GetAcceleration(
         Character &character,
         Params &params,
@@ -16,6 +16,7 @@ public:
         float &outAngularAcceleration);
 
     void DrawDebug();
+    void SetPath(std::vector<USVec2D> _path) { path = _path; };
 
 private:
     void UpdatePursueLocation(float lookAhead);

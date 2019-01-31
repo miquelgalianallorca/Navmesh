@@ -34,12 +34,6 @@ prop:setDeck(gfxQuad)
 entity = Character.new()
 -- Add prop to be the renderable for this character
 entity:setProp(prop, layer)
--- Start the character (allow calls to OnUpdate)
-entity:start()
-entity:setLoc(0, 0)
-entity:setRot(0)
-entity:setLinearVel(10, 20)
-entity:setAngularVel(30)
 
 -- Enable Debug Draw
 debug = MOAIDrawDebug.get();
@@ -49,6 +43,13 @@ pathfinder = Pathfinder.new()
 pathfinder:setStartPosition(5, 10)
 pathfinder:setEndPosition(20, 40)
 pathfinder:setCharacter(entity)
+
+-- Start the character (allow calls to OnUpdate)
+entity:start()
+entity:setLoc(0, 0)
+entity:setRot(0)
+entity:setLinearVel(10, 20)
+entity:setAngularVel(30)
 
 -- Add this character to draw debug
 MOAIDrawDebug.insertEntity(pathfinder)

@@ -130,21 +130,36 @@ void Pathfinder::UpdatePath()
 	}
 
     if (m_path)
+    {
         m_path->AStar(m_startPosition, m_endPosition);
+    }
 }
 
 void Pathfinder::SetStartPosition(float x, float y)
 { 
 	m_startPosition = USVec2D(x, y);
+    if (m_isStartPositionSet && character)
+        character->SetLoc(m_startPosition);
     m_isStartPositionSet = true;
-	UpdatePath();
+	
+    UpdatePath();
 }
 
 void Pathfinder::SetEndPosition(float x, float y)
 {
 	m_endPosition = USVec2D(x, y);
+    if (m_isEndPositionSet && character)
+        character->SetPath(m_path->GetPathPoints());
     m_isEndPositionSet = true;
     UpdatePath();
+
+    /*if (character)
+        character->SetPath(m_path->GetPathPoints());*/
+}
+
+std::vector<USVec2D> Pathfinder::GetPath()
+{
+    return m_path->GetPathPoints();
 }
 
 void Pathfinder::DrawDebug()

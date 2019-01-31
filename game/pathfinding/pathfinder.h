@@ -47,6 +47,8 @@ public:
 	const USVec2D& GetStartPosition() const { return m_startPosition;}
 	const USVec2D& GetEndPosition()   const { return m_endPosition;}
 
+    std::vector<USVec2D> GetPath();
+
     bool PathfindStep();
 
 private:

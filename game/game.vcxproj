@@ -162,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="sample\navmesh.xml" />
+    <Xml Include="sample\params.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

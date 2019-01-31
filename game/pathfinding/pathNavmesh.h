@@ -29,6 +29,8 @@ public:
 
 	void DrawDebug();
 
+    std::vector<USVec2D> GetPathPoints() { return pathPoints; }
+
 private:
 	// A* variables
 	std::list<Node*> openList;

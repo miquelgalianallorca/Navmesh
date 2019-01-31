@@ -38,33 +38,6 @@ void SteeringPathFollow::DrawDebug() {
     MOAIDraw::DrawEllipseFill(pursueLocation.mX, pursueLocation.mY, 6.f, 6.f, 10);
 }
 
-bool SteeringPathFollow::ReadPath(const char *filename) {
-    // Load XML
-    TiXmlDocument doc(filename);
-    if (!doc.LoadFile())
-    {
-        fprintf(stderr, "Couldn't read params from %s", filename);
-        return false;
-    }
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem = hDoc.FirstChildElement().Element();
-    if (!pElem)
-    {
-        fprintf(stderr, "Invalid format for %s", filename);
-        return false;
-    }
-
-    TiXmlElement* child = hDoc.FirstChild("root").FirstChild("points").FirstChild("point").ToElement();
-    for (child; child; child=child->NextSiblingElement()) {
-        int x, y;
-        child->Attribute("x", &x);
-        child->Attribute("y", &y);
-        path.push_back(USVec2D((float)x, (float)y));
-    }
-
-    return true;
-}
-
 void SteeringPathFollow::UpdatePursueLocation(float lookAhead) {
     // Find closest segment of path
     USVec2D closestPointLoc, nextPointLoc;

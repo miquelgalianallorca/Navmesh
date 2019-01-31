@@ -105,5 +105,8 @@
     <Xml Include="sample\navmesh.xml">
       <Filter>sample</Filter>
     </Xml>
+    <Xml Include="sample\params.xml">
+      <Filter>sample</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
